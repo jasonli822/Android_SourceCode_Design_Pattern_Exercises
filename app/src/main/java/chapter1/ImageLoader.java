@@ -19,16 +19,22 @@ import java.util.concurrent.Executors;
 public class ImageLoader {
     // 图片缓存
     ImageCache mImageCache = new ImageCache();
+    // SD卡缓存
+    DiskCache mDiskCache = new DiskCache();
+    // 是否使用SD卡缓存
+    boolean isUseDiskCache = false;
     // 线程池，线程数量为CPU的数量
     ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     // 加载图片
     public void displayImage(final String url, final ImageView imageView) {
-        Bitmap bitmap = mImageCache.get(url);
+        // 判断使用哪种缓存
+        Bitmap bitmap = isUseDiskCache ? mDiskCache.get(url) : mImageCache.get(url);
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
             return;
         }
+        // 没有缓存，则交给线程池进行下载
         imageView.setTag(url);
         mExecutorService.submit(new Runnable() {
             @Override
