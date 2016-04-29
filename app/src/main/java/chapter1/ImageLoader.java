@@ -14,50 +14,44 @@ import java.util.concurrent.Executors;
 /**
  * Created by jasonli822 on 2016/4/25.
  * 图片加载类
- * 原始需求：主管的要求很简单，要小民实现图片加载，并且要讲图片缓存起来。
+ * 原始需求：主管的要求很简单，要小民实现图片加载，并且要将图片缓存起来。
  */
 public class ImageLoader {
     // 图片缓存
-    ImageCache mImageCache = new ImageCache();
-    // SD卡缓存
-    DiskCache mDiskCache = new DiskCache();
-    // 双缓存
-    DoubleCache mDoubleCache = new DoubleCache();
-    // 是否使用SD卡缓存
-    boolean isUseDiskCache = false;
-    // 使用双缓存
-    boolean isUseDoubleCache = false;
+    ImageCache mImageCache = new MemoryCache();
     // 线程池，线程数量为CPU的数量
     ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
+    // 注入缓存实现
+    public void setImageCache(ImageCache cache) {
+        mImageCache = cache;
+    }
+
     // 加载图片
-    public void displayImage(final String url, final ImageView imageView) {
-        // 判断使用哪种缓存
-        Bitmap bitmap = null;
-        if (isUseDiskCache) {
-            bitmap = mDoubleCache.get(url);
-        } else if(isUseDiskCache) {
-            bitmap = mDiskCache.get(url);
-        } else {
-            bitmap = mImageCache.get(url);
-        }
+    public void displayImage(final String imageUrl, final ImageView imageView) {
+        Bitmap bitmap = mImageCache.get(imageUrl);
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
             return;
         }
-        // 没有缓存，则交给线程池进行下载
-        imageView.setTag(url);
+
+        // 图片没有缓存，提交到线程池中下载图片
+        submitLoadRequest(imageUrl, imageView);
+    }
+
+    private void submitLoadRequest(final String imageUrl, final ImageView imageView) {
+        imageView.setTag(imageUrl);
         mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                Bitmap bitmap = downloadImage(url);
+                Bitmap bitmap = downloadImage(imageUrl);
                 if (bitmap == null) {
-                   return;
+                    return;
                 }
-                if (imageView.getTag().equals(url)) {
+                if (imageView.getTag().equals(imageUrl)) {
                     imageView.setImageBitmap(bitmap);
                 }
-                mImageCache.put(url, bitmap);
+                mImageCache.put(imageUrl, bitmap);
             }
         });
     }
@@ -74,13 +68,5 @@ public class ImageLoader {
             e.printStackTrace();
         }
         return bitmap;
-    }
-
-    public void useDiskCache(boolean useDiskCache) {
-        isUseDiskCache = useDiskCache;
-    }
-
-    public void useDoubleCache(boolean useDoubleCache) {
-        isUseDoubleCache = useDoubleCache;
     }
 }

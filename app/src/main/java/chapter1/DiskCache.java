@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Created by jasonli822 on 2016/4/28.
  */
-public class DiskCache {
+public class DiskCache implements ImageCache {
     static String cacheDir = "sdcard/cache/";
 
     // 从SD卡缓存中获取图片
