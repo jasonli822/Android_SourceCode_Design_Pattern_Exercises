@@ -1,15 +1,17 @@
-package chapter1;
+package chapter1.core;
 
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v4.util.LruCache;
 import android.widget.ImageView;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import chapter1.cache.ImageCache;
+import chapter1.cache.MemoryCache;
 
 /**
  * Created by jasonli822 on 2016/4/25.

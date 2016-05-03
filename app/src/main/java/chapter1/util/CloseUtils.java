@@ -1,4 +1,4 @@
-package chapter1;
+package chapter1.util;
 
 import java.io.Closeable;
 import java.io.IOException;

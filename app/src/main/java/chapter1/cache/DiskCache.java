@@ -1,11 +1,12 @@
-package chapter1;
+package chapter1.cache;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
+
+import chapter1.util.CloseUtils;
 
 /**
  * Created by jasonli822 on 2016/4/28.

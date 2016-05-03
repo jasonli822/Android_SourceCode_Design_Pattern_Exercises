@@ -1,7 +1,9 @@
-package chapter1;
+package chapter1.cache;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;
+
+import chapter1.cache.ImageCache;
 
 /**
  * Created by jasonli822 on 2016/4/28.

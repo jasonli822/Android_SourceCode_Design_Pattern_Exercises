@@ -1,4 +1,4 @@
-package chapter1;
+package chapter1.cache;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;
