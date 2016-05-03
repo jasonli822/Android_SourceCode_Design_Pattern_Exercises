@@ -10,22 +10,25 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import chapter1.cache.DoubleCache;
 import chapter1.cache.ImageCache;
 import chapter1.cache.MemoryCache;
+import chapter1.config.ImageLoaderConfig;
 
 /**
  * Created by jasonli822 on 2016/4/25.
  * 图片加载类
  */
 public class ImageLoader {
+    // 图片加载配置对象
+    private ImageLoaderConfig mConfig;
+
+    // 图片缓存对象
+    private ImageCache mImageCache = new MemoryCache();
+
     // ImageLoader实例
     private static ImageLoader sInstance;
-    // 图片加载中显示的图片id
-    int mLoadingImageId;
-    // 加载失败时显示的图片id
-    int mLoadingFailedImageId;
-    // 图片缓存
-    ImageCache mImageCache = new MemoryCache();
+
     // 线程池，线程数量为CPU的数量
     ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -37,7 +40,7 @@ public class ImageLoader {
      * 获取ImageLoader单例，DCL形式
      * @return
      */
-    public static ImageLoader getsInstance() {
+    public static ImageLoader getInstance() {
         if (sInstance == null) {
             synchronized (ImageLoader.class) {
                 if (sInstance == null) {
@@ -48,24 +51,10 @@ public class ImageLoader {
         return sInstance;
     }
 
-    // 注入缓存实现
-    public void setImageCache(ImageCache cache) {
-        mImageCache = cache;
-    }
-
-    public void setLoadingImage(int resId) {
-        mLoadingImageId = resId;
-    }
-
-    public void setmLoadingFailedImage(int resId) {
-        mLoadingFailedImageId = resId;
-    }
-
-    public void setThreadCount(int count) {
-        mExecutorService.shutdown();
-        mExecutorService = null;
-        // 设置新的线程数量
-        mExecutorService = Executors.newFixedThreadPool(count);
+    public void init(ImageLoaderConfig config) {
+        mConfig = config;
+        mImageCache = config.getImageCache();
+        mExecutorService = Executors.newFixedThreadPool(config.getThreadCount());
     }
 
     // 加载图片
@@ -82,7 +71,7 @@ public class ImageLoader {
 
     private void submitLoadRequest(final String imageUrl, final ImageView imageView) {
         // 设置加载中的图片
-        imageView.setImageResource(mLoadingImageId);
+        imageView.setImageResource(mConfig.getDisplayConfig().loadingResId);
 
         imageView.setTag(imageUrl);
         mExecutorService.submit(new Runnable() {
@@ -91,7 +80,7 @@ public class ImageLoader {
                 Bitmap bitmap = downloadImage(imageUrl);
                 if (bitmap == null) {
                     // 设置加载图片失败后显示的图片
-                    imageView.setImageResource(mLoadingFailedImageId);
+                    imageView.setImageResource(mConfig.getDisplayConfig().failedResId);
                     return;
                 }
                 if (imageView.getTag().equals(imageUrl)) {
@@ -114,5 +103,18 @@ public class ImageLoader {
             e.printStackTrace();
         }
         return bitmap;
+    }
+
+    public static void main(String[] args) {
+        // ImageLoader初始化示例
+
+        ImageLoaderConfig config = new ImageLoaderConfig.Builder()
+                .setLoadingPlaceHolder(android.R.drawable.btn_default)
+                .setNotFoundPlaceholder(android.R.drawable.btn_default)
+                .setCache(new DoubleCache())
+                .setThreadCount(4).create();
+
+        // 将配置初始化到ImageLoader中
+        ImageLoader.getInstance().init(config);
     }
 }
