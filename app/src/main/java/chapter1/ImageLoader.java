@@ -17,6 +17,9 @@ import java.util.concurrent.Executors;
  * 原始需求：主管的要求很简单，要小民实现图片加载，并且要将图片缓存起来。
  */
 public class ImageLoader {
+    // ImageLoader实例
+    private static ImageLoader sInstance;
+
     // 图片缓存
     ImageCache mImageCache = new MemoryCache();
     // 线程池，线程数量为CPU的数量
@@ -25,6 +28,25 @@ public class ImageLoader {
     // 注入缓存实现
     public void setImageCache(ImageCache cache) {
         mImageCache = cache;
+    }
+
+    // 私有化构造函数
+    private ImageLoader() {
+    }
+
+    /**
+     * 获取ImageLoader单例，DCL形式
+     * @return
+     */
+    public static ImageLoader getsInstance() {
+        if (sInstance == null) {
+            synchronized (ImageLoader.class) {
+                if (sInstance == null) {
+                    sInstance = new ImageLoader();
+                }
+            }
+        }
+        return sInstance;
     }
 
     // 加载图片
