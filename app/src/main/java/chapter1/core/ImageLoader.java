@@ -16,21 +16,18 @@ import chapter1.cache.MemoryCache;
 /**
  * Created by jasonli822 on 2016/4/25.
  * 图片加载类
- * 原始需求：主管的要求很简单，要小民实现图片加载，并且要将图片缓存起来。
  */
 public class ImageLoader {
     // ImageLoader实例
     private static ImageLoader sInstance;
-
+    // 图片加载中显示的图片id
+    int mLoadingImageId;
+    // 加载失败时显示的图片id
+    int mLoadingFailedImageId;
     // 图片缓存
     ImageCache mImageCache = new MemoryCache();
     // 线程池，线程数量为CPU的数量
     ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-    // 注入缓存实现
-    public void setImageCache(ImageCache cache) {
-        mImageCache = cache;
-    }
 
     // 私有化构造函数
     private ImageLoader() {
@@ -51,6 +48,26 @@ public class ImageLoader {
         return sInstance;
     }
 
+    // 注入缓存实现
+    public void setImageCache(ImageCache cache) {
+        mImageCache = cache;
+    }
+
+    public void setLoadingImage(int resId) {
+        mLoadingImageId = resId;
+    }
+
+    public void setmLoadingFailedImage(int resId) {
+        mLoadingFailedImageId = resId;
+    }
+
+    public void setThreadCount(int count) {
+        mExecutorService.shutdown();
+        mExecutorService = null;
+        // 设置新的线程数量
+        mExecutorService = Executors.newFixedThreadPool(count);
+    }
+
     // 加载图片
     public void displayImage(final String imageUrl, final ImageView imageView) {
         Bitmap bitmap = mImageCache.get(imageUrl);
@@ -64,12 +81,17 @@ public class ImageLoader {
     }
 
     private void submitLoadRequest(final String imageUrl, final ImageView imageView) {
+        // 设置加载中的图片
+        imageView.setImageResource(mLoadingImageId);
+
         imageView.setTag(imageUrl);
         mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 Bitmap bitmap = downloadImage(imageUrl);
                 if (bitmap == null) {
+                    // 设置加载图片失败后显示的图片
+                    imageView.setImageResource(mLoadingFailedImageId);
                     return;
                 }
                 if (imageView.getTag().equals(imageUrl)) {
