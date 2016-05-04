@@ -1,0 +1,44 @@
+使程序运行更高效--原型模式介绍
+
+原型模式是一个创建型模式。原型二字表明了该模式应该有一个样板实例，用户从这个样板对象中复制出一个内部属性一致的对象，
+这个过程也就是我们俗称的“克隆”。原型模式多用于创建复杂的或者构造耗时的实例，因为这种情况下，复制一个已经存在的实例可使程序运行更高效。
+
+本例介绍了原型模式的简单实现。
+
+WordDocument中的克隆方法用以实现对象克隆。注意，这个方法并不是Cloneable接口中的，而是Object中的方法。Cloneable也是一个标识接口，它表明
+这个类的对象是可拷贝的。如果没有实现Cloneable接口却调用了clone()函数将抛出异常。
+
+运行Client得到的结果如下：
+
+------ WordDocument构造函数 ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是修改过的Doc2文本
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+
+doc2是通过originDoc.clone()创建的，并且doc2第一次输出的时候和originDoc输出是一样的，即doc2是originDoc的一份拷贝，它们的内容是一样的，而doc2修改了文本内容以后并不
+影响originDoc的文本内容，这就保证了originDoc的安全性。
