@@ -19,6 +19,7 @@ public class Client {
         doc2.showDocument();
         //  修改文档副本，不会影响原始文档
         doc2.setText("这是修改过的Doc2文本");
+        doc2.addImage("哈哈.jpg");
         doc2.showDocument();
 
         originDoc.showDocument();

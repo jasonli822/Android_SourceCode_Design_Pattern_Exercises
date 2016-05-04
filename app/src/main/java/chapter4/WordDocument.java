@@ -17,12 +17,17 @@ public class WordDocument implements Cloneable {
         System.out.println("------ WordDocument构造函数 ------");
     }
 
+    /**
+     * 克隆对象
+     * @return
+     */
     @Override
     protected WordDocument clone() {
         try {
             WordDocument doc = (WordDocument) super.clone();
             doc.mText = this.mText;
-            doc.mImages = this.mImages;
+            // 对mImages对象也调用clone()函数，进行深拷贝
+            doc.mImages = (ArrayList<String>) this.mImages.clone();
             return doc;
         } catch(Exception e) {
         }

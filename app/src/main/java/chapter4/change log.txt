@@ -42,3 +42,106 @@ image name :图片3
 
 doc2是通过originDoc.clone()创建的，并且doc2第一次输出的时候和originDoc输出是一样的，即doc2是originDoc的一份拷贝，它们的内容是一样的，而doc2修改了文本内容以后并不
 影响originDoc的文本内容，这就保证了originDoc的安全性。
+
+
+浅拷贝和深拷贝
+我们将Client的main函数内容稍稍修改
+
+...
+doc2.setText("这是修改过的Doc2文本");
+doc2.addImage("哈哈.jpg");
+...
+
+再次运行，输出结果如下：
+
+------ WordDocument构造函数 ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是修改过的Doc2文本
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+image name :哈哈.jpg
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+image name :哈哈.jpg
+------ Word Content End ------
+
+细心的读者可能发现了，最后两个文档信息输出是一致的。我们在doc2中添加了一张名为"哈哈.jpg"的照片，但是，同时也显示在 originDoc 中了，
+这是怎么回事呢？这是因为上文中WordDocument的clone方法中只是简单地进行浅拷贝，引用类型的新对象doc2的mImages只是单纯地指向了this.mImages引用，
+并没有重新构建一个mImages对象，然后将原始文档中的图片添加到新的mImages对象中，这样就导致doc2中的mImages与原始文档中的是同一个对象。那如何解决这个问题呢？
+答案是采用深拷贝，即在拷贝对象时，对于引用型字段也要采用拷贝的形式，而不是单纯引用的形式。clone方法修改如下：
+
+    /**
+     * 克隆对象
+     * @return
+     */
+    @Override
+    protected WordDocument clone() {
+        try {
+            WordDocument doc = (WordDocument) super.clone();
+            doc.mText = this.mText;
+            // 对mImages对象也调用clone()函数，进行深拷贝
+            doc.mImages = (ArrayList<String>) this.mImages.clone();
+            return doc;
+        } catch(Exception e) {
+        }
+        return null;
+    }
+
+
+这样，将doc.mImages指向this.mImages的一份拷贝，而不是this.mImages本身，这样在doc2添加图片时并不会影响originDoc,运行结果如下：
+
+------ WordDocument构造函数 ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是修改过的Doc2文本
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+image name :哈哈.jpg
+------ Word Content End ------
+------ Word Content Start ------
+Text :这是一篇文档
+Image List:
+image name :图片1
+image name :图片2
+image name :图片3
+------ Word Content End ------
+
+小结：
+原型模式是非常简单的一个模式，它的核心问题就是对原始对象进行拷贝，在这个模式的使用过程中需要注意的一点就是：深、浅拷贝的问题。
+在开发过程中，为了减少错误，作者建议大家在使用该模式时尽量使用深拷贝，避免操作副本时影响原始对象的问题。
