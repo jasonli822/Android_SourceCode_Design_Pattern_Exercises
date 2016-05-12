@@ -1,0 +1,76 @@
+命令模式的简单实现
+    命令模式总体来说并不难，只是相对比较繁琐，你想想一个简单的调用关系被解耦成多个部分，必定会增加类的复杂度，
+  但是即便如此，命令模式的的结构依然清晰。大家小时候应该都玩过俄罗斯方块游戏，这里以古老的俄罗斯方块游戏为例，
+  看看我们在命令模式下是如何操控俄罗斯方块变换的。
+
+    一般来说，俄罗斯方块游戏中有4个按钮，两个左右移动的按钮，一个快速落下的按钮，还有一个变化方块形状的按钮，这是
+  比较经典的游戏原型。
+
+    一个玩游戏的人就相当于我们的客户端，而游戏上的4个按钮就相当于请求者，或者也可以称为调用者，执行具体按钮命令的
+  逻辑方法可以看作是命令角色，当然，游戏内部具体是怎么实现的我们不知道，也不在这里探讨，仅做例子分析，最后真正执行
+  处理具体逻辑的则是游戏本身，你可以看做是各种机器码计算处理来执行的具体逻辑，这里我们将它看作是接收者角色。逻辑分析
+  比较清楚了，我们来将其“翻译”成代码，首先是我们的接收者，这里以俄罗斯方块游戏本身作为接收者角色。
+
+  TetrisMachine类是整个命令模式中唯一处理具体代码逻辑的地方，其他的类都是直接或间接地调用到该类的方法，这就是接收
+  者橘色，处理具体的逻辑。接收者只是一个普通的类，任何类都可以作为接收者。
+
+  接下来定义一个接口Command作为命令角色的抽象。
+
+  public interface Command {
+      /**
+       * 命令执行方法
+       */
+      void execute();
+  }
+
+  然后就是4个具体命令：向左移、向右移、掉落和变换。(LeftCommand,RightCommand,FallCommand,TransformCommand)
+
+  从程序可以看到，命令者角色类中的方法名称与TetrisMachine接收者角色类中的方法名可以不一样，两者之间仅是一种弱耦合。
+
+  对于请求者，这里我们以一个Buttons类来表示，命令由按钮来执行。
+
+  最后，由客户端(Player)来决定如何调用。
+
+  public class Player {
+      public static void main(String[] args) {
+          // 首先要有俄罗斯方块游戏
+          TetrisMachine machine = new TetrisMachine();
+
+          // 根据游戏我们创建4种命令
+          LeftCommand leftCommand = new LeftCommand(machine);
+          RightCommand rightCommand = new RightCommand(machine);
+          FallCommand fallCommand = new FallCommand(machine);
+          TransformCommand transformCommand = new TransformCommand(machine);
+
+          // 按钮可以执行不同的命令
+          Buttons buttons = new Buttons();
+          buttons.setLeftCommand(leftCommand);
+          buttons.setRightCommand(rightCommand);
+          buttons.setFallCommand(fallCommand);
+          buttons.setTransformCommand(transformCommand);
+
+          // 具体按下那个按钮玩家说了算
+          buttons.toLeft();
+          buttons.toRight();
+          buttons.fall();
+          buttons.transform();
+  }
+
+  在看了这一篇代码后心存疑惑，明明就是一个很简单的调用逻辑，为什么要做得如此复杂呢？对于大部分的开发者来说更愿意接受
+  如下的代码。
+  public class Player {
+    public static void main(Strings[] args) {
+      // 俄罗斯方块游戏
+      TetrisMachine machine = new TetrisMachine();
+
+      // 要实现怎样的控制方式，我们就直接调用相关的函数就行
+      machine.toLeft();
+      machine.toRight();
+      machine.fastToBottom();
+      machine.transform();
+    }
+  }
+
+  设计模式有一条重要的原则：对修改关闭对扩展开放，大家可以细细体会。 除此之外，使用命令模式的另一个好处是可以实现命令记录的功能，
+  如在上例中，我们在请求者Buttons里使用一个数据结构来存储执行过的命令对象，以此可以方便地知道刚刚执行过哪些命令动作，并可以在需要
+  时修复。
