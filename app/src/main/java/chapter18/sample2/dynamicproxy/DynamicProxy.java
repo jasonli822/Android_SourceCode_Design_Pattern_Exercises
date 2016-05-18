@@ -1,4 +1,4 @@
-package charpter18.sample2.dynamicproxy;
+package chapter18.sample2.dynamicproxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

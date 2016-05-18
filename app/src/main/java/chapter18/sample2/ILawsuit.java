@@ -1,4 +1,4 @@
-package charpter18.sample2;
+package chapter18.sample2;
 
 /**
  * Created by jasonli822 on 2016/5/17.

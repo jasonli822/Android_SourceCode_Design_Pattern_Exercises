@@ -1,9 +1,9 @@
-package charpter18.sample2.dynamicproxy;
+package chapter18.sample2.dynamicproxy;
 
 import java.lang.reflect.Proxy;
 
-import charpter18.sample2.ILawsuit;
-import charpter18.sample2.XiaoMin;
+import chapter18.sample2.ILawsuit;
+import chapter18.sample2.XiaoMin;
 
 /**
  * Created by jasonli822 on 2016/5/18.
