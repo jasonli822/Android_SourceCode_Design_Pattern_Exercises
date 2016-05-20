@@ -1,0 +1,38 @@
+    现实生活中有很多桥接模式应用的影子，比如开关与具体的电器，开关的类型有多种，而电器也是各式各样，这两者是独立
+变化的且有耦合。还有程序员天天对的显示屏，对于显示屏来说它的尺寸与生产商之间也是一种二维关系，具体的尺寸与具体的
+厂商独立变化。而更贴近生活的例子就是我们在喝咖啡时，大家知道去咖啡馆一般分为4种。大杯加糖、大杯不加糖、小杯加糖、
+小杯不加糖，对于一杯咖啡来说这4种实质上就两种变化，一是大杯小杯，二是加糖不加糖，不管怎样，我们先来定义一个咖啡类。
+
+Coffee: Coffee类中保持了对CoffeeAdditives的引用，以便调用具体的实现。同样地，咖啡还分大杯小杯，定义了两个子类
+继承于Coffee。
+
+LargeCoffee: 继承Coffee,大杯咖啡。
+SmallCoffee: 继承Coffee,小杯咖啡。
+
+而对于加进咖啡中的糖，当然也可以选择不加，我们也用一个抽象类定义。CoffeeAdditives.
+
+CoffeeAdditives对应的两个子类：加糖(sugar)与不加糖(ordinary)。
+
+不加糖我们以原味表示，最后看客户类Client,将两者进行整合。
+
+代码逻辑很简单，不难理解。如果此时咖啡框为了满足更多人的习惯，推出中杯的咖啡怎么办呢？对应于本例来说，这种需求变化
+其实就是Coffee类的变化，定义中杯的Coffee类扩展即可。
+public class MiddleCoffee extends Coffee {
+    public MiddleCoffee(CoffeeAdditives impl) {
+        super(impl);
+    }
+
+    @Override
+    public void makeCoffee() {
+        System.out.println("中杯的" + impl + "咖啡");
+    }
+}
+对应的客户类做出相应的增加即可。
+
+同样地，为了增加咖啡口味的种类，我们也可以让CoffeeAdditives类变化起来，增加更多的子类表示，诸如加奶、加蜂蜜、加
+盐等，具体代码就不再给出了，相信大家已经很清楚。从本例中我们还可以看到，不管是Coffee变化了还是CoffeeAdditives
+变化了，其相对于对方而言都是独立的没有什么过多的交集，两者之间唯一的联系就是Coffee中保持的对CoffeeAdditives的
+引用，此乃两者之间的纽带，这就是桥接模式。
+
+
+
